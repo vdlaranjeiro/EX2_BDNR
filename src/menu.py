@@ -28,6 +28,7 @@ while(opcao != 'S'):
                 print("2 - Excluir um usuário")
                 print("3 - Listar informações de um usuário")
                 print("4 - Atualizar informações de um usuário")
+                print("5 - Realizar uma compra")
                 acao = input("Selecione uma ação. (V para voltar) ").upper()
                 match acao:
                     case '1':
@@ -38,6 +39,8 @@ while(opcao != 'S'):
                         read_usuario(db)
                     case '4':
                         update_usuario(db)
+                    case '5':
+                        compra_usuario(db)
 
         case '2':
              while(acao != 'V'):
@@ -68,8 +71,8 @@ while(opcao != 'S'):
                     case '1':
                         create_produto(db)
                     case '2':
-                        delete_vendedor(db)
+                        delete_produto(db)
                     case '3':
-                        read_vendedor(db)
+                        read_produto(db)
                     case '4':
-                        update_vendedor(db)
+                        update_produto(db)

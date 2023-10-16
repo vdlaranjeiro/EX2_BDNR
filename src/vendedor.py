@@ -116,6 +116,19 @@ def read_vendedor(db):
             for telefone in vendedor['contatos']['telefones']:
                 print(telefone)
 
+            queryProdutos = {"_idVendedor": vendedor["_id"]}
+            mycol = db.Produtos
+            mydoc = mycol.find(queryProdutos)
+            produtos = list(mydoc)
+
+            if produtos:
+                print('\nProdutos deste vendedor: ')
+                for produto in produtos:
+                    print(f'Código: {produto["_id"]}')
+                    print(f'Nome: {produto["nome"]}')
+                    print(f'Valor: {produto["valor"]}\n')
+            else:
+                print('\nNão há produtos cadastrados nesse vendedor')
     return
 
 def update_vendedor(db):

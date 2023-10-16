@@ -1,3 +1,5 @@
+from datetime import datetime
+
 def create_usuario(db):
     print('\nInsira as informações do usuário')
     cpf = input('CPF: ')
@@ -97,9 +99,9 @@ def read_usuario(db):
 def update_usuario(db):
     cpf = input('\nDigite o cpf do usuário que deseja atualizar: ')
 
-    mycol = db.Usuarios
+    colunaUsuarios = db.Usuarios
     usuario = {"cpf": cpf}
-    mydoc = mycol.find_one(usuario)
+    mydoc = colunaUsuarios.find_one(usuario)
 
     if(mydoc):
         print(f'Editando informações de {mydoc["nome"]}. Aperte ENTER para pular um campo')
@@ -186,10 +188,160 @@ def update_usuario(db):
         if len(email):
             mydoc["contatos"]["email"] = email
         
+        keyUpdateFavoritos = input('\nDeseja atualizar os favoritos? S/N ').upper()
+        if(keyUpdateFavoritos == 'S'):
+            keyOpcaoFavoritos = 0
+            while(keyOpcaoFavoritos != 'C'):
+                print('1 - Adicionar um favorito')
+                print('2 - Remover um item favorito')
+                keyOpcaoFavoritos = input('Escolha uma opção: (C para cancelar) ').upper()
+                match keyOpcaoFavoritos:
+                    case '1':
+                        nomeProduto = input('Qual produto você deseja adicionar? ')
+                        queryProduto = {"nome": nomeProduto}
+                        colunaProdutos = db.Produtos
+                        produtos = colunaProdutos.find(queryProduto)
+
+                        produtos = list(produtos)
+                        if not(produtos):
+                            print('Não foram encontrados produtos com essas informações')
+                        else:
+                            for produto in produtos:
+                                print(f'\nCódigo: {produto["_id"]}')
+                                print(f'Nome: {produto["nome"]}')
+                                print(f'Descrição: {produto["descricao"]}')
+                                print(f'Valor: {produto["valor"]}')
+
+                            idProdutoEscolhido = input('Digite o código do produto escolhido: ')
+                            if(idProdutoEscolhido.isnumeric()):
+                                produtoEscolhido = next((produto for produto in produtos if produto["_id"] == int(idProdutoEscolhido)), None)
+                                if(produtoEscolhido):
+                                    favorito = {
+                                    "id_produto": produtoEscolhido["_id"],
+                                    "nome": produtoEscolhido["nome"],
+                                    "descricao": produtoEscolhido["descricao"],
+                                    "valor": produtoEscolhido["valor"]
+                                    }
+
+                                    mydoc["favoritos"].append(favorito)
+                                    print(f'{produtoEscolhido["nome"]} adicionado aos favoritos')
+                                else:
+                                    print('Código inválido')
+                            else:
+                                print('Código inválido')
+                    case '2':
+                        if not(mydoc["favoritos"]):
+                            print('Não há itens nos favoritos para remover')
+                        else:
+                            for favorito in mydoc["favoritos"]:
+                                print(f'\nCódigo: {favorito["id_produto"]}')
+                                print(f'Nome: {favorito["nome"]}')
+                                print(f'Descrição: {favorito["descricao"]}')
+                                print(f'Valor: {favorito["valor"]}')
+                            
+                            idFavoritoEscolhido = input('Digite o código do favorito que deseja remover: ')
+                            if(idFavoritoEscolhido.isnumeric()):
+                                favoritoEscolhido = next((favorito for favorito in mydoc["favoritos"] if favorito["id_produto"] == int(idFavoritoEscolhido)), None)
+                                if(favoritoEscolhido):
+                                    mydoc["favoritos"].remove(favoritoEscolhido)
+                                    print('Favorito removido')
+                                else:
+                                    print('Código inválido')
+                            else:
+                                print('Código inválido')
+
         novasInformacoes = {"$set": mydoc}
-        mycol.update_one(usuario, novasInformacoes)
+        colunaUsuarios.update_one(usuario, novasInformacoes)
         print('\nInformações atualizadas com sucesso!')
     else:
         print("\nNão foram encontrados usuários com esse CPF")
+
+    return
+
+def compra_usuario(db):
+    cpf = input('Digite o cpf do usuário realizando a compra: ')
+    colunaUsuarios = db.Usuarios
+    queryUsuario = {"cpf": cpf}
+    usuario = colunaUsuarios.find_one(queryUsuario)
+
+    if not(usuario):
+        print('Usuário não encontrado')
+    else:
+        nomeProduto = input('Qual produto deseja comprar? ')
+        colunaProdutos = db.Produtos
+        queryProduto = {"nome": nomeProduto}
+        produtos = colunaProdutos.find(queryProduto)
+        produtos = list(produtos)
+
+        if not(produtos):
+            print('Produto não encontrado')
+        else:
+            for produto in produtos:
+                print('\nProdutos encontrados:')
+                print(f'\nCódigo: {produto["_id"]}')
+                print(f'Nome: {produto["nome"]}')
+                print(f'Descrição: {produto["descricao"]}')
+                print(f'Valor: {produto["valor"]}')
+
+            verificacaoCodigoProduto = 0
+            produtoEscolhido = {}
+            while(verificacaoCodigoProduto != 1):
+                idProdutoEscolhido = input('Digite o código do produto que deseja comprar: ')
+                if(idProdutoEscolhido.isnumeric()):
+                    produtoEscolhido = next((produto for produto in produtos if produto["_id"] == int(idProdutoEscolhido)), None)
+                    if(produtoEscolhido):
+                        verificacaoCodigoProduto = 1
+                    else:
+                        print('Código inválido')
+                else:
+                    print('Código inválido')
+
+            verificacaoQuantidadeProduto = 0
+            quantidadeDisponivel = produtoEscolhido["quantidade"]
+            while(verificacaoQuantidadeProduto != 1):
+                print(f'\nQuantidade disponível: {quantidadeDisponivel}')
+                quantidadeEscolhida = input('Quantas unidades deseja comprar? ')
+
+                if(quantidadeEscolhida.isnumeric()):
+                    quantidadeEscolhida = int(quantidadeEscolhida)
+                    if(quantidadeEscolhida > quantidadeDisponivel):
+                        print('Quantidade indisponível')
+                    else:
+                        verificacaoQuantidadeProduto = 1
+                else:
+                    print('Digite uma quantidade válida.')
+
+            print(f'\nCompra no nome de {usuario["nome"]}')
+            print(f'Produto: {produtoEscolhido["nome"]}')
+            print(f'Quantidade: {quantidadeEscolhida}')
+            print(f'Valor: {produtoEscolhido["valor"] * quantidadeEscolhida}')
+
+            confirmarCompra = input('\nConfirmar compra? S/N ').upper()
+            if(confirmarCompra == 'S'):
+                dataAtual = datetime.now()
+                compra = {
+                    "id_produto": produtoEscolhido["_id"],
+                    "nome_produto": produtoEscolhido["nome"],
+                    "descricao_produto": produtoEscolhido["descricao"],
+                    "quantidade": quantidadeEscolhida,
+                    "valor_compra": produtoEscolhido["valor"] * quantidadeEscolhida,
+                    "data_compra": dataAtual.strftime('%d/%m/%Y %H:%M')
+                }
+
+
+                usuario["compras"].append(compra)
+                novasInformacoes = {"$set": usuario}
+                colunaUsuarios.update_one(queryUsuario, novasInformacoes)
+
+                queryProduto = {"_id": produtoEscolhido["_id"]}
+                novasInformacoes = {"$set": {
+                    "quantidade": produtoEscolhido["quantidade"] - quantidadeEscolhida
+                }}
+                colunaProdutos.update_one(queryProduto, novasInformacoes)
+
+                print('Compra realizada com sucesso! ')
+
+            elif(confirmarCompra == 'N'):
+                print('Compra cancelada.')
 
     return
