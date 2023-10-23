@@ -9,6 +9,7 @@ def create_usuario(db):
     keyEnderecos = 0
     while(keyEnderecos != 'N'):
         print('\nDigite seu endereço: ')
+        cep = input('CEP: ')
         rua = input('Rua: ')
         numero = input('Número: ')
         bairro = input('Bairro: ')
@@ -16,6 +17,7 @@ def create_usuario(db):
         estado = input('Estado: ')
 
         endereco = {
+            "cep": cep,
             "rua": rua,
             "numero": numero,
             "bairro": bairro,
@@ -74,7 +76,8 @@ def read_usuario(db):
 
             print("Endereços:")
             for endereco in usuario['enderecos']:
-                print(f"\nRua: {endereco['rua']}")
+                print(f"\nCEP: {endereco['cep']}")
+                print(f"Rua: {endereco['rua']}")
                 print(f"Número: {endereco['numero']}")
                 print(f"Bairro: {endereco['bairro']}")
                 print(f"Cidade: {endereco['cidade']}")
@@ -120,6 +123,7 @@ def update_usuario(db):
                 match keyOpcaoEnderecos:
                     case '1':
                         endereco = {
+                            "cep": input('CEP: '),
                             "rua": input('Rua: '),
                             "numero": input('Numero: '),
                             "bairro": input('Bairro: '),
@@ -133,6 +137,7 @@ def update_usuario(db):
                         contadorEndereco = 1
                         for endereco in mydoc["enderecos"]:
                             print(f'\nEndereço {contadorEndereco}')
+                            print(f"CEP: {endereco['cep']}")
                             print(f"Rua: {endereco['rua']}")
                             print(f"Número: {endereco['numero']}")
                             print(f"Bairro: {endereco['bairro']}")

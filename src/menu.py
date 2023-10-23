@@ -5,7 +5,7 @@ from usuario import *
 from vendedor import *
 from produto import *
 
-uri = "mongodb+srv://viniciuslaranjeiro:senhateste@ecommerce.wmpyahq.mongodb.net/?retryWrites=true&w=majority"
+uri = ""
 client = MongoClient(uri, server_api=ServerApi('1'))
 
 global db
