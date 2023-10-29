@@ -37,7 +37,7 @@ def create_produto(db):
         else:
             print('Não foram encontrados vendedores com essas informações')
 
-    ultimoId = db.Produtos.find_one({"_id": 1}) 
+    ultimoId = db.Produtos.find_one(sort=[("_id", -1)]) 
     if not(ultimoId):
         produto = {
             "_id": 1,
