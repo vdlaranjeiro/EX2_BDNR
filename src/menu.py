@@ -9,7 +9,7 @@ uri = ""
 client = MongoClient(uri, server_api=ServerApi('1'))
 
 global db
-db = client.Ecommerce
+db = client.EX2
 
 
 opcao = 0

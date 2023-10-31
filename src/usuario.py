@@ -1,4 +1,5 @@
 from datetime import datetime
+import uuid
 
 def create_usuario(db):
     print('\nInsira as informações do usuário')
@@ -222,6 +223,7 @@ def update_usuario(db):
                                 produtoEscolhido = next((produto for produto in produtos if produto["_id"] == int(idProdutoEscolhido)), None)
                                 if(produtoEscolhido):
                                     favorito = {
+                                    "_id": str(uuid.uuid4()),
                                     "id_produto": produtoEscolhido["_id"],
                                     "nome": produtoEscolhido["nome"],
                                     "descricao": produtoEscolhido["descricao"],
@@ -274,7 +276,7 @@ def compra_usuario(db):
     else:
         nomeProduto = input('Qual produto deseja comprar? ')
         colunaProdutos = db.Produtos
-        queryProduto = {"nome": nomeProduto}
+        queryProduto = {"nome": {"$regex": nomeProduto, "$options": "i"}}
         produtos = colunaProdutos.find(queryProduto)
         produtos = list(produtos)
 
@@ -325,6 +327,7 @@ def compra_usuario(db):
             if(confirmarCompra == 'S'):
                 dataAtual = datetime.now()
                 compra = {
+                    "_id": str(uuid.uuid4()),
                     "id_produto": produtoEscolhido["_id"],
                     "nome_produto": produtoEscolhido["nome"],
                     "descricao_produto": produtoEscolhido["descricao"],
