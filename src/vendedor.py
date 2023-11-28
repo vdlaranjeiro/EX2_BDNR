@@ -131,8 +131,24 @@ def read_vendedor(db):
                 print('\nNão há produtos cadastrados nesse vendedor')
     return
 
+def read_all_vendedor(db):
+    colecaoVendedores = db.Vendedores
+    vendedores = colecaoVendedores.find({}, {'nome': 1, "cpf": 1, "cnpj": 1, "_id": 0})
+
+    vendedores = list(vendedores)
+
+    if not vendedores:
+        print("\nNão há vendedores cadastrados.")
+    else:
+        print("\nVendedores:")
+        for usuario in vendedores:
+            if len(usuario['cpf']): print(f"\nCPF: {usuario['cpf']}")
+            if len(usuario['cnpj']): print(f"\nCNPJ: {usuario['cnpj']}")
+            print(f"Nome: {usuario['nome']}")
+    return
+
 def update_vendedor(db):
-    cpfOuCnpj = input('Digite o cpf ou cnpj do vendedor que deseja excluir: ')
+    cpfOuCnpj = input('Digite o cpf ou cnpj do vendedor que deseja atualizar: ')
 
     mycol = db.Vendedores 
     myquery = {

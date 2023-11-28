@@ -95,6 +95,22 @@ def read_produto(db):
     
     return
 
+def read_all_produto(db):
+    colecaoProdutos = db.Produtos
+    produtos = colecaoProdutos.find({}, {'nome': 1, "valor": 1, "_id": 1})
+
+    produtos = list(produtos)
+
+    if not produtos:
+        print("\nNão há produtos cadastrados.")
+    else:
+        print("\nUsuários:")
+        for produto in produtos:
+            print(f"\nCódigo: {produto['_id']}")
+            print(f"Nome: {produto['nome']}")
+            print(f"Valor: {produto['valor']}")
+    return
+
 def update_produto(db):
     idProduto = int(input('\nDigite o código do produto que deseja atualizar: '))
 

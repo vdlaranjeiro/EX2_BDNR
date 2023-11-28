@@ -92,20 +92,41 @@ def read_usuario(db):
 
             print("\nFavoritos:")
             for favorito in usuario['favoritos']:
-                print(favorito)
+                print(f'\nNome: {favorito["nome"]}')
+                print(f'Descrição: {favorito["descricao"]}')
+                print(f'Valor: {favorito["valor"]}')
 
             print("\nCompras:")
             for compra in usuario['compras']:
-                print(compra)
+                print(f'\nNome: {compra["nome_produto"]}')
+                print(f'Descrição: {compra["descricao_produto"]}')
+                print(f'Quantidade: {compra["quantidade"]}')
+                print(f'Valor: {compra["valor_compra"]}')
+                print(f'Data: {compra["data_compra"]}')
     
+    return
+
+def read_all_usuario(db):
+    colecaoUsuarios = db.Usuarios
+    usuarios = colecaoUsuarios.find({}, {'nome': 1, "cpf": 1, "_id": 0})
+
+    usuarios = list(usuarios)
+
+    if not usuarios:
+        print("\nNão há usuários cadastrados.")
+    else:
+        print("\nUsuários:")
+        for usuario in usuarios:
+            print(f"\nCPF: {usuario['cpf']}")
+            print(f"Nome: {usuario['nome']}")
     return
 
 def update_usuario(db):
     cpf = input('\nDigite o cpf do usuário que deseja atualizar: ')
 
-    colunaUsuarios = db.Usuarios
+    colecaoUsuarios = db.Usuarios
     usuario = {"cpf": cpf}
-    mydoc = colunaUsuarios.find_one(usuario)
+    mydoc = colecaoUsuarios.find_one(usuario)
 
     if(mydoc):
         print(f'Editando informações de {mydoc["nome"]}. Aperte ENTER para pular um campo')
@@ -203,10 +224,10 @@ def update_usuario(db):
                 keyOpcaoFavoritos = input('Escolha uma opção: (C para cancelar) ').upper()
                 match keyOpcaoFavoritos:
                     case '1':
-                        nomeProduto = input('Qual produto você deseja adicionar? ')
-                        queryProduto = {"nome": nomeProduto}
-                        colunaProdutos = db.Produtos
-                        produtos = colunaProdutos.find(queryProduto)
+                        nomeProduto = input('Qual produto você deseja adicionar? (digite o nome) ')
+                        queryProduto = {"nome": {"$regex": nomeProduto, "$options": "i"}}
+                        colecaoProdutos = db.Produtos
+                        produtos = colecaoProdutos.find(queryProduto)
 
                         produtos = list(produtos)
                         if not(produtos):
@@ -258,7 +279,7 @@ def update_usuario(db):
                                 print('Código inválido')
 
         novasInformacoes = {"$set": mydoc}
-        colunaUsuarios.update_one(usuario, novasInformacoes)
+        colecaoUsuarios.update_one(usuario, novasInformacoes)
         print('\nInformações atualizadas com sucesso!')
     else:
         print("\nNão foram encontrados usuários com esse CPF")
@@ -267,17 +288,17 @@ def update_usuario(db):
 
 def compra_usuario(db):
     cpf = input('Digite o cpf do usuário realizando a compra: ')
-    colunaUsuarios = db.Usuarios
+    colecaoUsuarios = db.Usuarios
     queryUsuario = {"cpf": cpf}
-    usuario = colunaUsuarios.find_one(queryUsuario)
+    usuario = colecaoUsuarios.find_one(queryUsuario)
 
     if not(usuario):
         print('Usuário não encontrado')
     else:
-        nomeProduto = input('Qual produto deseja comprar? ')
-        colunaProdutos = db.Produtos
+        nomeProduto = input('Qual produto deseja comprar? (digite o nome) ')
+        colecaoProdutos = db.Produtos
         queryProduto = {"nome": {"$regex": nomeProduto, "$options": "i"}}
-        produtos = colunaProdutos.find(queryProduto)
+        produtos = colecaoProdutos.find(queryProduto)
         produtos = list(produtos)
 
         if not(produtos):
@@ -339,13 +360,13 @@ def compra_usuario(db):
 
                 usuario["compras"].append(compra)
                 novasInformacoes = {"$set": usuario}
-                colunaUsuarios.update_one(queryUsuario, novasInformacoes)
+                colecaoUsuarios.update_one(queryUsuario, novasInformacoes)
 
                 queryProduto = {"_id": produtoEscolhido["_id"]}
                 novasInformacoes = {"$set": {
                     "quantidade": produtoEscolhido["quantidade"] - quantidadeEscolhida
                 }}
-                colunaProdutos.update_one(queryProduto, novasInformacoes)
+                colecaoProdutos.update_one(queryProduto, novasInformacoes)
 
                 print('Compra realizada com sucesso! ')
 
